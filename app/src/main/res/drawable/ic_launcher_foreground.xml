@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Cuerpo del control remoto -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,26 L60,26 A8,8 0 0 1 68,34 L68,74 A8,8 0 0 1 60,82 L48,82 A8,8 0 0 1 40,74 L40,34 A8,8 0 0 1 48,26 Z" />
+
+    <!-- Botón de encendido -->
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M54,36 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+
+    <!-- D-Pad -->
+    <path
+        android:fillColor="#312E81"
+        android:pathData="M49,46 L59,46 A3,3 0 0 1 62,49 L62,59 A3,3 0 0 1 59,62 L49,62 A3,3 0 0 1 46,59 L46,49 A3,3 0 0 1 49,46 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,49 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+    <!-- Botones inferiores -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M50,69 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M58,69 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+
+    <!-- Ondas infrarrojas -->
+    <path
+        android:pathData="M74,38 A14,14 0 0 1 74,58"
+        android:strokeColor="#A5B4FC"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M80,32 A22,22 0 0 1 80,64"
+        android:strokeColor="#C7D2FE"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+</vector>

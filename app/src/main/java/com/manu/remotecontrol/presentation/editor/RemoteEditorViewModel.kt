@@ -19,10 +19,8 @@ import com.manu.remotecontrol.domain.usecase.SaveButtonUseCase
 import com.manu.remotecontrol.domain.usecase.SaveDeviceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,9 +41,12 @@ data class ButtonForm(
 
 data class EditorUiState(
     val device: RemoteDevice? = null,
+    /** `true` en cuanto el dispositivo emite por primera vez (aunque emita `null`). */
+    val deviceLoaded: Boolean = false,
     val buttons: List<RemoteButton> = emptyList(),
     val form: ButtonForm? = null,
     val formError: String? = null,
+    val isSaving: Boolean = false,
     val protocolOptions: List<IrProtocolId> = IrProtocolId.entries,
     val renameDialog: Boolean = false,
     val message: String? = null
@@ -64,29 +65,42 @@ class RemoteEditorViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val deviceId: Long = savedStateHandle.get<Long>("deviceId") ?: 0L
-    private val local = MutableStateFlow(EditorUiState())
 
-    val uiState: StateFlow<EditorUiState> = combine(
-        observeDevice(deviceId),
-        observeButtons(deviceId),
-        local
-    ) { device, buttons, localState ->
-        localState.copy(device = device, buttons = buttons)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = EditorUiState()
-    )
+    /**
+     * Estado único de la pantalla.
+     *
+     * Antes había dos fuentes (`local` + el `combine` de Room) y sólo el flujo combinado
+     * llevaba `device` y `buttons`; `local` se quedaba siempre vacío. Por eso `saveForm()`
+     * salía en el `device ?: return` y el botón Guardar no hacía absolutamente nada.
+     */
+    private val _uiState = MutableStateFlow(EditorUiState())
+    val uiState: StateFlow<EditorUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            observeDevice(deviceId).collect { device ->
+                _uiState.update { it.copy(device = device, deviceLoaded = true) }
+            }
+        }
+        viewModelScope.launch {
+            observeButtons(deviceId).collect { buttons ->
+                _uiState.update { it.copy(buttons = buttons) }
+            }
+        }
+    }
 
     fun startAdd() {
-        local.update {
-            it.copy(form = ButtonForm(frequencyKhz = it.device?.carrierFrequencyHz?.div(1000) ?: 38), formError = null)
+        _uiState.update {
+            it.copy(
+                form = ButtonForm(frequencyKhz = it.device?.carrierFrequencyHz?.div(1000) ?: 38),
+                formError = null
+            )
         }
     }
 
     fun startEdit(button: RemoteButton) {
         val code = button.code
-        local.update {
+        _uiState.update {
             it.copy(
                 form = ButtonForm(
                     id = button.id,
@@ -104,21 +118,39 @@ class RemoteEditorViewModel @Inject constructor(
     }
 
     fun updateForm(transform: (ButtonForm) -> ButtonForm) {
-        local.update { state ->
+        _uiState.update { state ->
             val form = state.form ?: return@update state
             state.copy(form = transform(form), formError = null)
         }
     }
 
-    fun dismissForm() = local.update { it.copy(form = null, formError = null) }
+    fun dismissForm() = _uiState.update { it.copy(form = null, formError = null, isSaving = false) }
 
+    /**
+     * Valida el formulario y guarda el botón (alta si `form.id == 0`, edición si ya existe).
+     * Cualquier fallo se muestra dentro del diálogo: nunca se sale en silencio.
+     */
     fun saveForm() {
-        val state = local.value
+        val state = _uiState.value
         val form = state.form ?: return
-        val device = state.device ?: return
+        if (state.isSaving) return
 
         if (form.label.isBlank()) {
-            local.update { it.copy(formError = "Escribe una etiqueta para el botón") }
+            _uiState.update { it.copy(formError = "Escribe una etiqueta para el botón") }
+            return
+        }
+
+        val device = state.device
+        if (device == null) {
+            _uiState.update {
+                it.copy(
+                    formError = if (state.deviceLoaded) {
+                        "Este control ya no existe. Vuelve atrás y ábrelo de nuevo."
+                    } else {
+                        "El control aún se está cargando. Espera un segundo e inténtalo otra vez."
+                    }
+                )
+            }
             return
         }
 
@@ -131,29 +163,45 @@ class RemoteEditorViewModel @Inject constructor(
         )
 
         if (parsed == null) {
-            local.update {
+            _uiState.update {
                 it.copy(formError = instructionFor(form.protocol))
             }
             return
         }
 
-        val existing = state.buttons.firstOrNull { it.id == form.id }
+        val existing = if (form.isEditing) state.buttons.firstOrNull { it.id == form.id } else null
         val sortOrder = existing?.sortOrder
             ?: ((state.buttons.maxOfOrNull { it.sortOrder } ?: 0) + 1)
 
+        _uiState.update { it.copy(isSaving = true, formError = null) }
+
         viewModelScope.launch {
-            saveButton(
-                createButton(
-                    deviceId = device.id,
-                    label = form.label.trim(),
-                    role = form.role,
-                    section = sectionFor(form.role),
-                    code = parsed,
-                    sortOrder = sortOrder
-                ).copy(id = form.id)
-            )
-            local.update {
-                it.copy(form = null, message = if (form.isEditing) "Botón actualizado" else "Botón añadido")
+            runCatching {
+                saveButton(
+                    createButton(
+                        deviceId = device.id,
+                        label = form.label.trim(),
+                        role = form.role,
+                        section = sectionFor(form.role),
+                        code = parsed,
+                        sortOrder = sortOrder
+                    ).copy(id = if (existing != null) existing.id else 0L)
+                )
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        form = null,
+                        isSaving = false,
+                        message = if (form.isEditing) "Botón actualizado" else "Botón añadido"
+                    )
+                }
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(
+                        isSaving = false,
+                        formError = "No se pudo guardar el botón: ${error.message ?: "error desconocido"}"
+                    )
+                }
             }
         }
     }
@@ -162,19 +210,19 @@ class RemoteEditorViewModel @Inject constructor(
         viewModelScope.launch { deleteButton(button.id) }
     }
 
-    fun openRename() = local.update { it.copy(renameDialog = true) }
+    fun openRename() = _uiState.update { it.copy(renameDialog = true) }
 
-    fun closeRename() = local.update { it.copy(renameDialog = false) }
+    fun closeRename() = _uiState.update { it.copy(renameDialog = false) }
 
     fun renameDevice(name: String) {
-        val device = local.value.device ?: return
+        val device = _uiState.value.device ?: return
         viewModelScope.launch {
             saveDevice(device.copy(name = name.trim().ifBlank { device.name }))
-            local.update { it.copy(renameDialog = false, message = "Nombre actualizado") }
+            _uiState.update { it.copy(renameDialog = false, message = "Nombre actualizado") }
         }
     }
 
-    fun clearMessage() = local.update { it.copy(message = null) }
+    fun clearMessage() = _uiState.update { it.copy(message = null) }
 
     fun duplicate(button: RemoteButton) {
         viewModelScope.launch {
@@ -182,7 +230,7 @@ class RemoteEditorViewModel @Inject constructor(
                 button.copy(
                     id = 0L,
                     label = "${button.label} (copia)",
-                    sortOrder = (local.value.buttons.maxOfOrNull { it.sortOrder } ?: 0) + 1
+                    sortOrder = (_uiState.value.buttons.maxOfOrNull { it.sortOrder } ?: 0) + 1
                 )
             )
         }

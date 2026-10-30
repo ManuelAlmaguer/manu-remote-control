@@ -28,13 +28,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -178,6 +178,7 @@ fun RemoteEditorScreen(
             form = form,
             protocolOptions = state.protocolOptions,
             error = state.formError,
+            saving = state.isSaving,
             onDismiss = viewModel::dismissForm,
             onUpdate = viewModel::updateForm,
             onSave = viewModel::saveForm
@@ -255,6 +256,7 @@ private fun ButtonFormDialog(
     form: ButtonForm,
     protocolOptions: List<IrProtocolId>,
     error: String?,
+    saving: Boolean,
     onDismiss: () -> Unit,
     onUpdate: ((ButtonForm) -> ButtonForm) -> Unit,
     onSave: () -> Unit
@@ -263,7 +265,7 @@ private fun ButtonFormDialog(
     var protocolMenu by remember { mutableStateOf(false) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!saving) onDismiss() },
         title = { Text(if (form.isEditing) "Editar botón" else "Nuevo botón") },
         text = {
             Column(
@@ -397,8 +399,24 @@ private fun ButtonFormDialog(
                 }
             }
         },
-        confirmButton = { Button(onClick = onSave) { Text("Guardar") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+        confirmButton = {
+            Button(onClick = onSave, enabled = !saving) {
+                if (saving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text("Guardando…")
+                } else {
+                    Text("Guardar")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, enabled = !saving) { Text("Cancelar") }
+        }
     )
 }
 

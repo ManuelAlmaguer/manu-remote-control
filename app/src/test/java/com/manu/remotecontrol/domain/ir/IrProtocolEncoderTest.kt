@@ -264,8 +264,8 @@ class IrProtocolEncoderTest {
         assertEquals(0x20, bits.value(8, 8))    // vendor id, byte alto
         assertEquals(0x00, bits.value(16, 8))   // paridad de vendor + genre1
         assertEquals(0x00, bits.value(24, 8))   // genre2 + comando bajo
-        assertEquals(0x10, bits.value(32, 8))   // id + comando alto
-        assertEquals(0x10, bits.value(40, 8))   // paridad de los tres bytes anteriores
+        assertEquals(0x01, bits.value(32, 8))   // id + comando alto (0x010 >> 4)
+        assertEquals(0x01, bits.value(40, 8))   // paridad de los tres bytes anteriores
     }
 
     // ---------------------------------------------------------------- Pioneer

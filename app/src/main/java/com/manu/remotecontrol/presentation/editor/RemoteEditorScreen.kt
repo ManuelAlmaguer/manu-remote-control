@@ -426,5 +426,7 @@ private fun helperFor(protocol: IrProtocolId): String = when (protocol) {
     IrProtocolId.SAMSUNG -> "Samsung 32: 8 dígitos HEX. Ejemplo E0E040BF."
     IrProtocolId.SONY_SIRC -> "Sony SIRC: 4 dígitos HEX (dispositivo + comando). Ejemplo 0115."
     IrProtocolId.RC5 -> "RC-5: 4 dígitos HEX (sistema 0-31 + comando 0-63). Ejemplo 000C."
+    IrProtocolId.KASEIKYO -> "Kaseikyo/Panasonic: 11 dígitos HEX (8 de dirección + 3 de comando). Ejemplo 20020010010."
+    IrProtocolId.PIONEER -> "Pioneer: 4 dígitos HEX (dirección + comando). Ejemplo A15A."
     IrProtocolId.RAW -> "RAW: duraciones en microsegundos separadas por espacios, empezando por marca."
 }

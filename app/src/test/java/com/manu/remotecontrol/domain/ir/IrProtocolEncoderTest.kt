@@ -244,6 +244,51 @@ class IrProtocolEncoderTest {
         }
     }
 
+
+    // ---------------------------------------------------------------- Kaseikyo / Panasonic
+
+    @Test
+    fun `kaseikyo frame has header 48 bits and parity byte`() {
+        // vendor 0x2002 (Panasonic), genre1 0, genre2 0, comando 0x010
+        val code = IrCode.Kaseikyo(address = 0x00200200, command = 0x010)
+        val encoding = registry.encode(code)
+        val bits = decodePulseDistance(encoding.pattern, skip = 2, bitCount = 48)
+
+        assertEquals(IrProtocolId.KASEIKYO, code.protocol)
+        assertEquals(99, encoding.pattern.size)
+        assertEquals(3_456, encoding.pattern[0])
+        assertEquals(1_728, encoding.pattern[1])
+        assertEquals(37_000, encoding.frequencyHz)
+
+        assertEquals(0x02, bits.value(0, 8))    // vendor id, byte bajo
+        assertEquals(0x20, bits.value(8, 8))    // vendor id, byte alto
+        assertEquals(0x00, bits.value(16, 8))   // paridad de vendor + genre1
+        assertEquals(0x00, bits.value(24, 8))   // genre2 + comando bajo
+        assertEquals(0x10, bits.value(32, 8))   // id + comando alto
+        assertEquals(0x10, bits.value(40, 8))   // paridad de los tres bytes anteriores
+    }
+
+    // ---------------------------------------------------------------- Pioneer
+
+    @Test
+    fun `pioneer frame repeats address and command inverted`() {
+        val code = IrCode.Pioneer(address = 0xA1, command = 0x5A, repeats = 1)
+        val encoding = registry.encode(code)
+        val bits = decodePulseDistance(encoding.pattern, skip = 2, bitCount = 33)
+
+        assertEquals(IrProtocolId.PIONEER, code.protocol)
+        assertEquals(69, encoding.pattern.size)
+        assertEquals(8_500, encoding.pattern[0])
+        assertEquals(4_225, encoding.pattern[1])
+        assertEquals(40_000, encoding.frequencyHz)
+
+        assertEquals(0xA1, bits.value(0, 8))
+        assertEquals(0x5E, bits.value(8, 8))    // ~0xA1
+        assertEquals(0x5A, bits.value(16, 8))
+        assertEquals(0xA5, bits.value(24, 8))   // ~0x5A
+        assertEquals(0x00, bits.value(32, 1))
+    }
+
     private object NecEncoderConstants {
         const val FRAME_GAP = 40_000
     }

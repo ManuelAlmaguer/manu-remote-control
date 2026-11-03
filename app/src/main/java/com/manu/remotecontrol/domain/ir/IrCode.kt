@@ -83,6 +83,37 @@ sealed interface IrCode {
     }
 
     /**
+     * Kaseikyo / Panasonic de 48 bits (37 kHz).
+     *
+     * @param address 32 bits empaquetados: bits 31-30 id de fabricante, 29-8 vendor id de
+     *   16 bits, 7-4 genre1 y 3-0 genre2. El codificador calcula solo las paridades.
+     * @param command comando de 10 bits.
+     */
+    data class Kaseikyo(
+        val address: Int,
+        val command: Int,
+        override val frequencyHz: Int = 37_000,
+        override val repeats: Int = 1
+    ) : IrCode {
+        override val protocol: IrProtocolId get() = IrProtocolId.KASEIKYO
+    }
+
+    /**
+     * Pioneer de 33 bits (40 kHz): dirección y comando con sus complementos.
+     *
+     * @param address dirección de 8 bits.
+     * @param command comando de 8 bits.
+     */
+    data class Pioneer(
+        val address: Int,
+        val command: Int,
+        override val frequencyHz: Int = 40_000,
+        override val repeats: Int = 2
+    ) : IrCode {
+        override val protocol: IrProtocolId get() = IrProtocolId.PIONEER
+    }
+
+    /**
      * Patrón crudo en microsegundos (pares marca/espacio alternos empezando por marca).
      * Sirve para códigos aprendidos, Pronto convertido o aires acondicionados complejos.
      */

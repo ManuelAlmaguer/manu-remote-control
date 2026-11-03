@@ -115,6 +115,9 @@ interface CatalogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertButtons(buttons: List<CatalogButtonEntity>)
 
+    @Query("DELETE FROM catalog_buttons")
+    suspend fun clearButtons()
+
     @Query("DELETE FROM catalog_devices")
     suspend fun clearDevices()
 }

@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "remotes": [
+    {
+      "id": "kt1440",
+      "title": "KT1440",
+      "brand": "GSSC / WINFLIKE / ZdalaMit (genérico chino)",
+      "summary": "Mando universal de reemplazo para TV, cajas decodificadoras y DVD. Tiene dos teclas de dispositivo: TV y Caja/DVD, y se programa con códigos de 3 dígitos de su folleto.",
+      "notes": [
+        "No es un mando universal completo: solo funciona con las marcas de su lista (Haier, Panda, Atec, Konka, Parker, Soyea, Mico, RealTv, Gelec, Runch, Wentai, AV Link).",
+        "Permite programar dos aparatos a la vez: uno en la tecla TV y otro en la tecla Caja/DVD.",
+        "Según el fabricante no tiene búsqueda automática: se programa por código directo (o por búsqueda manual paso a paso)."
+      ],
+      "source": "Lista de códigos y manual: radio.cantidubi.com/manual-mando-gssc-kt1440 y manuals.plus/asin/B08NDPX1MT",
+      "manual": [
+        {
+          "title": "1. Programar el televisor (tecla TV)",
+          "steps": [
+            "Enciende el televisor y apunta el mando hacia él.",
+            "Mantén pulsada la tecla TV durante 3 segundos hasta que el indicador luminoso quede encendido.",
+            "Escribe el código de 3 dígitos de la marca según la lista de abajo (por ejemplo, Panda = 003).",
+            "El indicador se apaga solo. Prueba Encendido, Volumen + y Cambio de canal.",
+            "Si no responde, repite el proceso con el siguiente código de esa marca (los códigos se prueban en orden)."
+          ]
+        },
+        {
+          "title": "2. Programar la caja decodificadora o el DVD (tecla Caja/DVD)",
+          "steps": [
+            "Enciende la caja o el DVD y apunta el mando hacia él.",
+            "Mantén pulsada la tecla Caja/DVD durante 3 segundos hasta que el indicador quede encendido.",
+            "Escribe el código de 3 dígitos de la lista de cajas (101-109) o de DVD (201-202).",
+            "El indicador se apaga. Prueba Encendido y Cambio de canal.",
+            "Para volver a controlar el televisor, pulsa la tecla TV (el mando recuerda las dos programaciones por separado)."
+          ]
+        },
+        {
+          "title": "3. Si ningún código de la lista funciona",
+          "steps": [
+            "Mantén pulsada la tecla del aparato (TV o Caja/DVD) hasta que el indicador quede fijo.",
+            "Pulsa Volumen + una vez por segundo, apuntando al equipo: cada pulsación envía un código distinto.",
+            "Cuando el equipo responda (sube el volumen, cambia de canal o se apaga), pulsa SET o TV para guardar el código.",
+            "Si se pasa del código correcto, apaga el equipo y repite la búsqueda desde el principio."
+          ]
+        },
+        {
+          "title": "4. Teclas y detalles útiles",
+          "steps": [
+            "El botón pequeño entre Encendido y la tecla de la derecha cambia la entrada a AV (útil para ver la caja decodificadora).",
+            "La tecla USB abre el menú de la memoria USB en los televisores que la soportan.",
+            "Para ver la guía o el menú del día siguiente usa Menú/Guía; en muchas cajas la información está en la tecla Info.",
+            "Si el mando se queda sin códigos guardados (por ejemplo tras cambiar las pilas), vuelve a programarlo con la misma lista."
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "name": "Televisores (tecla TV)",
+          "codes": [
+            { "code": "001", "brand": "Haier", "description": "Haier 21\" CRT", "appBrand": "Haier", "appType": "TV" },
+            { "code": "002", "brand": "Haier", "description": "Haier 29\" CRT", "appBrand": "Haier", "appType": "TV" },
+            { "code": "003", "brand": "Panda", "description": "Panda 21\" CRT", "appBrand": "Panda", "appType": "TV" },
+            { "code": "004", "brand": "Konka", "description": "Todos los TV Konka híbridos", "appBrand": "Konka", "appType": "TV" },
+            { "code": "005", "brand": "Konka", "description": "Todos los TV Konka analógicos", "appBrand": "Konka", "appType": "TV" },
+            { "code": "006", "brand": "Atec", "description": "Atec híbrido", "appBrand": "ATEC", "appType": "TV" },
+            { "code": "007", "brand": "Parker", "description": "Parker 21\" TV2195", "appBrand": "Parker", "appType": "TV" },
+            { "code": "008", "brand": "Parker", "description": "Parker 14\" TV14F5", "appBrand": "Parker", "appType": "TV" },
+            { "code": "009", "brand": "Atec", "description": "Atec DTV", "appBrand": "ATEC", "appType": "TV" },
+            { "code": "010", "brand": "Soyea", "description": "Soyea DTV", "appBrand": "Soyea", "appType": "TV" }
+          ]
+        },
+        {
+          "name": "Cajas decodificadoras (tecla Caja/DVD)",
+          "codes": [
+            { "code": "101", "brand": "Konka", "description": "Todas las cajas Konka", "appBrand": "Konka", "appType": "OTHER" },
+            { "code": "102", "brand": "Mico", "description": "Mico DT46-N03" },
+            { "code": "103", "brand": "Mico", "description": "Mico DT25-2080" },
+            { "code": "104", "brand": "RealTv", "description": "RealTv HMA1" },
+            { "code": "105", "brand": "Haier", "description": "Haier HDMB-2000T/M" },
+            { "code": "106", "brand": "Soyea", "description": "Soyea SPD160" },
+            { "code": "107", "brand": "Gelec", "description": "Gelec SD-HL-215G" },
+            { "code": "108", "brand": "Gelec", "description": "Gelec HD-HL-1209" },
+            { "code": "109", "brand": "Runch", "description": "Todas las cajas Runch" }
+          ]
+        },
+        {
+          "name": "DVD (tecla Caja/DVD)",
+          "codes": [
+            { "code": "201", "brand": "Wentai", "description": "Wentai 3031 / 3032" },
+            { "code": "202", "brand": "AV Link", "description": "AV Link LW 109A" }
+          ]
+        }
+      ]
+    }
+  ]
+}

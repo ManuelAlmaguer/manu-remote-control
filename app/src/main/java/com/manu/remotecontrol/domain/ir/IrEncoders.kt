@@ -1,6 +1,8 @@
 package com.manu.remotecontrol.domain.ir
 
+import com.manu.remotecontrol.domain.ir.protocols.KaseikyoEncoder
 import com.manu.remotecontrol.domain.ir.protocols.NecEncoder
+import com.manu.remotecontrol.domain.ir.protocols.PioneerEncoder
 import com.manu.remotecontrol.domain.ir.protocols.RawEncoder
 import com.manu.remotecontrol.domain.ir.protocols.Rc5Encoder
 import com.manu.remotecontrol.domain.ir.protocols.SamsungEncoder
@@ -19,6 +21,8 @@ object IrEncoders {
         SamsungEncoder(),
         SonySircEncoder(),
         Rc5Encoder(),
+        KaseikyoEncoder(),
+        PioneerEncoder(),
         RawEncoder()
     )
 

@@ -12,12 +12,14 @@ import com.manu.remotecontrol.presentation.editor.RemoteEditorScreen
 import com.manu.remotecontrol.presentation.home.HomeScreen
 import com.manu.remotecontrol.presentation.remote.RemoteControlScreen
 import com.manu.remotecontrol.presentation.settings.SettingsScreen
+import com.manu.remotecontrol.presentation.universal.UniversalRemotesScreen
 
 /** Rutas de navegación de la app. */
 object Routes {
     const val HOME = "home"
     const val ADD_DEVICE = "add_device"
     const val SETTINGS = "settings"
+    const val UNIVERSAL = "universal_remotes"
     const val REMOTE = "remote/{deviceId}"
     const val EDITOR = "editor/{deviceId}"
 
@@ -33,7 +35,15 @@ fun ManuNavHost(navController: NavHostController = rememberNavController()) {
                 onAddDevice = { navController.navigate(Routes.ADD_DEVICE) },
                 onOpenDevice = { deviceId -> navController.navigate(Routes.remote(deviceId)) },
                 onEditButtons = { deviceId -> navController.navigate(Routes.editor(deviceId)) },
-                onOpenSettings = { navController.navigate(Routes.SETTINGS) }
+                onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onOpenUniversalRemotes = { navController.navigate(Routes.UNIVERSAL) }
+            )
+        }
+
+        composable(Routes.UNIVERSAL) {
+            UniversalRemotesScreen(
+                onBack = { navController.popBackStack() },
+                onOpenCatalog = { navController.navigate(Routes.ADD_DEVICE) }
             )
         }
 

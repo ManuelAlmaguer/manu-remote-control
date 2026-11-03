@@ -62,6 +62,7 @@ fun HomeScreen(
     onOpenDevice: (Long) -> Unit,
     onEditButtons: (Long) -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenUniversalRemotes: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -117,6 +118,10 @@ fun HomeScreen(
                     hardware = state.hardware,
                     simulationForced = state.settings.forceSimulationMode
                 )
+            }
+
+            item {
+                UniversalRemotesCard(onClick = onOpenUniversalRemotes)
             }
 
             item {
@@ -302,6 +307,41 @@ private fun DeviceCard(
                         }
                     )
                 }
+            }
+        }
+    }
+}
+
+/** Acceso a la sección de mandos universales físicos (KT1440 y siguientes). */
+@Composable
+private fun UniversalRemotesCard(onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Settings,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Mandos universales",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "KT1440: manual de programación y tabla completa de códigos",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

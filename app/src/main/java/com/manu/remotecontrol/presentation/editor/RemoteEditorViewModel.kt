@@ -260,6 +260,8 @@ class RemoteEditorViewModel @Inject constructor(
         IrProtocolId.SAMSUNG -> "Samsung 32 usa 8 dígitos HEX (por ejemplo E0E040BF)."
         IrProtocolId.SONY_SIRC -> "Sony SIRC usa 4 dígitos HEX: dispositivo + comando (por ejemplo 0115)."
         IrProtocolId.RC5 -> "RC-5 usa 4 dígitos HEX: sistema + comando (por ejemplo 000C)."
+        IrProtocolId.KASEIKYO -> "Kaseikyo/Panasonic usa 11 dígitos HEX: 8 de dirección + 3 de comando (por ejemplo 20020010010)."
+        IrProtocolId.PIONEER -> "Pioneer usa 4 dígitos HEX: dirección + comando (por ejemplo A15A)."
         IrProtocolId.RAW -> "El modo RAW espera microsegundos separados por espacios (por ejemplo 9000 4500 560 560)."
     }
 }

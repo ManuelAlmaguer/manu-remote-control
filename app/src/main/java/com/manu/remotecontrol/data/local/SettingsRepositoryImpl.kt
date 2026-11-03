@@ -36,6 +36,7 @@ class SettingsRepositoryImpl @Inject constructor(
         val forceSimulation = booleanPreferencesKey("force_simulation")
         val showSignalDetails = booleanPreferencesKey("show_signal_details")
         val seeded = booleanPreferencesKey("seed_completed")
+        val catalogVersion = intPreferencesKey("catalog_version")
     }
 
     override val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
@@ -78,5 +79,13 @@ class SettingsRepositoryImpl @Inject constructor(
 
     suspend fun markSeeded() {
         context.settingsDataStore.edit { it[Keys.seeded] = true }
+    }
+
+    /** Versión del catálogo extendido ya importada en Room (0 si nunca se importó). */
+    suspend fun catalogVersion(): Int =
+        context.settingsDataStore.data.map { it[Keys.catalogVersion] ?: 0 }.first()
+
+    suspend fun setCatalogVersion(version: Int) {
+        context.settingsDataStore.edit { it[Keys.catalogVersion] = version }
     }
 }

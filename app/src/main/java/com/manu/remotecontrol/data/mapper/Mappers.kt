@@ -54,6 +54,22 @@ object IrCodeMapper {
             repeats = code.repeats
         )
 
+        is IrCode.Kaseikyo -> IrColumns(
+            protocol = code.protocol.name,
+            frequencyHz = code.frequencyHz,
+            address = code.address,
+            command = code.command,
+            repeats = code.repeats
+        )
+
+        is IrCode.Pioneer -> IrColumns(
+            protocol = code.protocol.name,
+            frequencyHz = code.frequencyHz,
+            address = code.address,
+            command = code.command,
+            repeats = code.repeats
+        )
+
         is IrCode.Raw -> IrColumns(
             protocol = code.protocol.name,
             frequencyHz = code.frequencyHz,
@@ -78,6 +94,8 @@ object IrCodeMapper {
         IrProtocolId.SAMSUNG -> IrCode.Samsung(address, command, frequencyHz, repeats.coerceAtLeast(1))
         IrProtocolId.SONY_SIRC -> IrCode.Sony(address, command, bits, frequencyHz, repeats.coerceAtLeast(2))
         IrProtocolId.RC5 -> IrCode.Rc5(address, command, toggle, frequencyHz, repeats.coerceAtLeast(1))
+        IrProtocolId.KASEIKYO -> IrCode.Kaseikyo(address, command, frequencyHz, repeats.coerceAtLeast(1))
+        IrProtocolId.PIONEER -> IrCode.Pioneer(address, command, frequencyHz, repeats.coerceAtLeast(2))
         IrProtocolId.RAW -> IrCode.Raw(
             pattern = rawPattern.orEmpty().split(" ").filter { it.isNotBlank() }.mapNotNull { it.toIntOrNull() },
             frequencyHz = frequencyHz,

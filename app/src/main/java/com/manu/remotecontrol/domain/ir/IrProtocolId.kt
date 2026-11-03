@@ -20,6 +20,8 @@ enum class IrProtocolId(
     SAMSUNG("Samsung 32", 38_000),
     SONY_SIRC("Sony SIRC (12/15/20)", 40_000),
     RC5("Philips RC-5", 36_000),
+    KASEIKYO("Kaseikyo / Panasonic 48", 37_000),
+    PIONEER("Pioneer 33", 40_000),
     RAW("RAW (microsegundos)", 38_000, supportsRaw = true);
 
     companion object {

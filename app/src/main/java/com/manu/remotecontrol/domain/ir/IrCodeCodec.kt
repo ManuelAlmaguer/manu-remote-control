@@ -10,6 +10,8 @@ import com.manu.remotecontrol.domain.ir.protocols.RawEncoder
  * - NEC / NEC extendido / Samsung: 8 dígitos hexadecimales (4 bytes, MSB primero).
  * - Sony SIRC: 4 dígitos (device + command de 7 bits).
  * - RC-5: 4 dígitos (sistema de 5 bits + comando de 6 bits).
+ * - Kaseikyo / Panasonic: 12 dígitos (dirección de 32 bits + comando de 10 bits).
+ * - Pioneer: 4 dígitos (dirección + comando, ambos de 8 bits).
  * - RAW: lista de microsegundos separada por espacios.
  */
 object IrCodeCodec {
@@ -40,6 +42,11 @@ object IrCodeCodec {
         is IrCode.Sony -> "%02X%02X".format(code.device and 0xFF, code.command and 0x7F)
 
         is IrCode.Rc5 -> "%02X%02X".format(code.system and 0x1F, code.command and 0x3F)
+
+        // Kaseikyo: dirección de 32 bits + comando de 10 bits (12 dígitos hexadecimales).
+        is IrCode.Kaseikyo -> "%08X%03X".format(code.address, code.command and 0x3FF)
+
+        is IrCode.Pioneer -> "%02X%02X".format(code.address and 0xFF, code.command and 0xFF)
 
         is IrCode.Raw -> code.pattern.joinToString(" ")
     }
@@ -118,6 +125,26 @@ object IrCodeCodec {
             IrProtocolId.RAW -> {
                 val pattern = RawEncoder.parsePattern(hexInput) ?: return null
                 IrCode.Raw(pattern = pattern, frequencyHz = frequencyHz, repeats = repeats)
+            }
+
+            IrProtocolId.KASEIKYO -> {
+                if (cleaned.length != 11 || cleaned.any { it.digitToIntOrNull(HEX_RADIX) == null }) return null
+                IrCode.Kaseikyo(
+                    address = cleaned.substring(0, 8).toLong(HEX_RADIX).toInt(),
+                    command = cleaned.substring(8, 11).toInt(HEX_RADIX) and 0x3FF,
+                    frequencyHz = frequencyHz,
+                    repeats = repeats
+                )
+            }
+
+            IrProtocolId.PIONEER -> {
+                if (cleaned.length != 4 || cleaned.any { it.digitToIntOrNull(HEX_RADIX) == null }) return null
+                IrCode.Pioneer(
+                    address = cleaned.substring(0, 2).toInt(HEX_RADIX),
+                    command = cleaned.substring(2, 4).toInt(HEX_RADIX),
+                    frequencyHz = frequencyHz,
+                    repeats = repeats
+                )
             }
         }
     }
